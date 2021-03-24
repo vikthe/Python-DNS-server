@@ -1,1 +1,1 @@
-#Python DNS server that can block certain domains
+# Python DNS server that can block certain domains
