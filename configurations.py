@@ -2,7 +2,7 @@ import os
 import platform
 import json
 
-# ger "\\" om os är windows och "/" om os är unix-baserat
+#returns "\\" if os is windows and "/" if os is unix-based
 def determineslash():
     os = (platform.system()).lower()
     if "windows" == os:
@@ -10,13 +10,16 @@ def determineslash():
     else:
         return "/"
 
-slash = determineslash()
 
 def init():
-    #Kollar om konfiguretionsfilen config.json finns annars skapas den
+    slash = determineslash()
+
+    #checks if konfiguretionfile config.json exist and creates new if it doesnt
+    print(os.getcwd() + slash + "config.json")
     if os.path.exists(os.getcwd() + slash + "config.json"):
-        pass
+        print(os.getcwd() + slash + "config.json", "exists move on")
     else:
+        print("Hi")
         dict = []
         blacklists = ["config_files" + slash + "blacklist.txt", "config_files" + slash + "blacklist2.txt" ]
         whitelists = ["config_files" + slash + "whitelist.txt"]
@@ -27,11 +30,36 @@ def init():
                      'Localaddresslists': localaddresslists, 'Public_DNS_servers': publicdnsservers})
 
         with open("config.json", "w+", encoding="utf-8") as configfile:
+
             json.dump(dict, configfile, indent=2)
         configfile.close()
 
+
+    #checks if folder config_files exists and creates it if it doesnt
+    print(os.getcwd() + slash + "config_files")
+    if os.path.exists(os.getcwd() + slash + "config_files"):
+        pass
+    else:
+        os.mkdir(os.getcwd() + slash + "config_files")
+
+    #creates examplefiles if the dont exist
+    def checkandcreatefiles(file, message):
+        path = os.getcwd() + slash + "config_files" + slash + file
+        if os.path.exists(path):
+            pass
+        else:
+            with open(path, "w+") as f:
+                f.write(message)
+            f.close()
+
+    checkandcreatefiles("blacklist.txt", "#Blocks specified domain, example: \n#0.0.0.0 www.youtube.com")
+    checkandcreatefiles("localaddresslist.txt", "#Add addresses in a local network, example: \n#192.168.1.10 my.website.com")
+    checkandcreatefiles("whitelist.txt", "Add domains you want to whitelist from wordlist or/and blacklist, example:\n#youtube.com")
+    checkandcreatefiles("wordlist.txt", "#Domainnames with these words included in are blocked, example: \n#ad, ads, word, hello")
+
+
 def getfromjson(list):
-    #Hämtar värden från config.json
+    #returns values from config.json
     with open("config.json", "r") as cf:
         configdata = json.load(cf)
     cf.close()
@@ -39,5 +67,3 @@ def getfromjson(list):
     data = configdata[0][list]
     print(list, data)
     return data
-
-#getfromjson('Public_DNS_servers')
