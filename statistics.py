@@ -1,0 +1,2 @@
+def addtostatistics(domainname):
+    pass
