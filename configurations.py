@@ -1,5 +1,7 @@
 import os
 import json
+import time
+
 
 def init():
     #checks if konfiguretionfile config.json exist and creates new if it doesnt
@@ -46,26 +48,78 @@ def init():
 
 def getfromjson(list):
     #returns values from config.json as an array
-    with open("config.json", "r") as cf:
-        configdata = json.load(cf)
-    cf.close()
+    try:
+        with open("config.json", "r") as cf:
+            configdata = json.load(cf)
+        cf.close()
 
-    data = configdata[0][list]
-    print(list, data)
-    return data
+        data = configdata[0][list]
+        print(list, data)
+        return data
+
+    except FileNotFoundError:
+        print("FileNotFoundError: config.json doesn't exists")
+
+
 
 def setjson(category, action, value):
     #function to change json file (used by flask app)
-    pass
+    try:
+        with open("config.json", "r") as cf:
+            configdata = json.load(cf)
+            categorydata = configdata[0][category]
+        cf.close()
 
-def setlist(list, action, value):
+        if action == "add":
+            categorydata.append("config_files" + os.sep + value)
+
+        elif action == "remove":
+            for item in categorydata:
+                if item.split(os.sep)[-1] == value:
+                    categorydata.remove(item)
+
+        with open("config.json", "w") as cf:
+            json.dump(configdata, cf, indent=2)
+        cf.close()
+
+    except FileNotFoundError:
+        print("FileNotFoundError: config.json doesn't exists")
+    except KeyError:
+        print("KeyError: Category not found")
+
+
+def setlist(listarray, action, value):
     #function to change or set value in lists (blacklist, whitelist etc)
-    pass
+    if action == "add":
+        firstlist = listarray[0]
+        print(firstlist)
+        with open(firstlist, "a") as lf:
+            lf.write(value + "\n")
+        lf.close()
+
+    elif action == "remove":
+        for list in listarray:
+            linelist = []
+            print(list)
+            with open(list, "r") as lf:
+                for line in lf:
+                    print(line)
+                    print(value)
+                    if line.strip() != value and line != '' and line != '\n':
+                            linelist.append(line)
+            lf.close()
+            with open(list, "w") as lf:
+                print("linelist", linelist)
+                lf.writelines(linelist)
+            lf.close()
+
+
+setlist(getfromjson("Blacklists"), "add", "0.0.0.0 bajs.com")
 
 
 def checkdomainname(domainname):
     def iscomment(line):
-        #kollar om raden är utkommenterad eller ej
+        #checks if line is a comment
         if line[0] == "#":
             return True
         else:

@@ -85,6 +85,3 @@ class DNSrequest:
         #Lägger ihop alla delar till ett DNS-paket
         packet = Header + Question + Answer
         return packet
-
-
-
