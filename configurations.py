@@ -45,7 +45,7 @@ def init():
 
 
 def getfromjson(list):
-    #returns values from config.json
+    #returns values from config.json as an array
     with open("config.json", "r") as cf:
         configdata = json.load(cf)
     cf.close()
@@ -54,11 +54,16 @@ def getfromjson(list):
     print(list, data)
     return data
 
-def setjson():
-    #set values to json
+def setjson(category, action, value):
+    #function to change json file (used by flask app)
     pass
 
-def checkdomainname(self):
+def setlist(list, action, value):
+    #function to change or set value in lists (blacklist, whitelist etc)
+    pass
+
+
+def checkdomainname(domainname):
     def iscomment(line):
         #kollar om raden är utkommenterad eller ej
         if line[0] == "#":
@@ -71,7 +76,7 @@ def checkdomainname(self):
             with open(list, "r") as lf:
                 if listtype == "blacklist":
                     for line in lf:
-                        if self.domainname == line.split()[1] and not iscomment(line):
+                        if domainname == line.split()[1] and not iscomment(line):
                             return True
 
                 elif listtype == "wordlist":
@@ -79,48 +84,40 @@ def checkdomainname(self):
                         if not iscomment(line):
                             words = line.split(",")
                             for word in words:
-                                if word == self.domainname:
+                                if word == domainname:
                                     return True
 
                 elif listtype == "whitelist":
                     for line in lf:
-                        if line == self.domainname and not iscomment(line):
+                        if line == domainname and not iscomment(line):
                             return True
 
                 elif listtype == "locallist":
                     for line in lf:
-                        if self.domainname == line.split()[1] and not iscomment(line):
+                        if domainname == line.split()[1] and not iscomment(line):
                             return line.split()[0]
 
         return False
 
 
-    blacklistarray = config.getfromjson('Blacklists')
-    print(blacklistarray)
-    blacklistcheck = checklists(blacklistarray, "blacklist")
-
-    whitelistarray = config.getfromjson('Whitelists')
-    whitelistcheck = checklists(whitelistarray, "whitelist")
-
+    blacklistcheck = checklists(getfromjson('Blacklists'), "blacklist")
+    whitelistcheck = checklists(getfromjson('Whitelists'), "whitelist")
     if blacklistcheck and not whitelistcheck:
-        #om den är blacklistad och inte whitelistad returnas 0.0.0.0 annars kollas om den är med i wordlist eller locallist
-        print("Blacklisted", self.domainname)
+        #returns 0.0.0.0 if blacklisted while not whitelisted, if not it checks if domainname is in wordlist or locallist
         return "0.0.0.0", "local"
 
     else:
-        wordlistarray = config.getfromjson('Wordlists')
-        wordlistcheck = checklists(wordlistarray, "wordlist")
+        wordlistcheck = checklists(getfromjson('Wordlists'), "wordlist")
         if wordlistcheck and not whitelistcheck:
-            #om den blir blockad i wordlist och inte finns med i whitelist ska det returna 0.0.0.0
+            #if domainname is blocked by wordlist and not in whitelist function returns 0.0.0.0
             return "0.0.0.0", "local"
 
         else:
-            #om den inte är blockad än kollas localaddresslist
-            locallistarray = config.getfromjson('Localaddresslists')
-            locallistcheck = checklists(locallistarray, "locallist")
+            #if domainame not blocked yet it checks localaddresslist
+            locallistcheck = checklists(getfromjson('Localaddresslists'), "locallist")
             if locallistcheck:
                 return locallistcheck, "local"
 
             else:
-                #sista utvägen är att skicka till publik DNS
+                #last resort is to send it to public dns-server
                 return None, "public"

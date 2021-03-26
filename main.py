@@ -12,9 +12,11 @@ s.bind((host,port))
 while True:
     data , addr = s.recvfrom(size)
     print("Raw request", data)
+
     req = DNSrequest(data)
     print("Domainname", req.domainname)
-    ip, addresstype = req.checkdomainname()
+
+    ip, addresstype = config.checkdomainname(req.domainname)
     print(ip, addresstype)
 
     if addresstype == "local":
