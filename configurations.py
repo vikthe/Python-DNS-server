@@ -103,8 +103,8 @@ def setlist(listarray, action, value):
             print(list)
             with open(list, "r") as lf:
                 for line in lf:
-                    print(line)
-                    print(value)
+                    #print(line)
+                    #print(value)
                     if line.strip() != value and line != '' and line != '\n':
                             linelist.append(line)
             lf.close()
@@ -114,10 +114,8 @@ def setlist(listarray, action, value):
             lf.close()
 
 
-setlist(getfromjson("Blacklists"), "add", "0.0.0.0 bajs.com")
-
-
 def checkdomainname(domainname):
+    domainname = domainname.lower()
     def iscomment(line):
         #checks if line is a comment
         if line[0] == "#":
@@ -130,7 +128,7 @@ def checkdomainname(domainname):
             with open(list, "r") as lf:
                 if listtype == "blacklist":
                     for line in lf:
-                        if domainname == line.split()[1] and not iscomment(line):
+                        if domainname == line.split()[1].lower() and not iscomment(line):
                             return True
 
                 elif listtype == "wordlist":
@@ -138,18 +136,18 @@ def checkdomainname(domainname):
                         if not iscomment(line):
                             words = line.split(",")
                             for word in words:
-                                if word == domainname:
+                                if domainname ==  word.lower():
                                     return True
 
                 elif listtype == "whitelist":
                     for line in lf:
-                        if line == domainname and not iscomment(line):
+                        if domainname == line.lower() and not iscomment(line):
                             return True
 
                 elif listtype == "locallist":
                     for line in lf:
-                        if domainname == line.split()[1] and not iscomment(line):
-                            return line.split()[0]
+                        if domainname == line.split()[1].lower() and not iscomment(line):
+                            return line.split()[0].lower()
 
         return False
 
