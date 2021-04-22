@@ -1,22 +1,40 @@
+//göra fineify url function. /statistics/ --> /statistics 
+
 var configbtn = document.getElementById("configbutton");
 var statsbtn = document.getElementById("statisticsbutton");
 var headerbtn = document.getElementById("header");
 var maincontainer = document.getElementById("maincontainer");
 var btncontainer = document.getElementById("buttoncontainer");
-
+var contentcontainer = document.getElementById("contentcontainer");
 var testdiv = document.getElementById("testdiv")
+
+
+if(window.location.pathname == "/statistics" || window.location.pathname == "/statistics/"){
+    btncontainer.innerHTML = "";
+    window.history.replaceState({}, null, "/statistics");
+    contentcontainer.innerHTML = "stats"
+    createstatsbtns();
+}
+
+if(window.location.pathname == "/statistics/speed"){
+    btncontainer.innerHTML = "";
+    window.history.replaceState({}, null, "/statistics");
+    contentcontainer.innerHTML = "stats"
+    createstatsbtns();
+}
+
 
 //onclick events for navbar and header
 configbtn.onclick = function(){
     btncontainer.innerHTML = "";
     window.history.pushState({}, null, "/configurations");
-    testdiv.innerHTML = "conf";
+    contentcontainer.innerHTML = "configs"
 }
 statsbtn.onclick = function(){
     btncontainer.innerHTML = "";
     window.history.pushState({}, null, "/statistics");
-    testdiv.innerHTML = "stats"
-    createbtns();
+    contentcontainer.innerHTML = "stats"
+    createstatsbtns();
 }
 
 headerbtn.onclick = function(){
@@ -26,7 +44,7 @@ headerbtn.onclick = function(){
 }
 
 //creates buttons and listeners for statistics menu
-function createbtns(){
+function createstatsbtns(){
     let speedtestbtn = document.createElement("div");
     speedtestbtn.className = "menubutton";
     speedtestbtn.innerHTML = "Speedtest"
@@ -41,6 +59,4 @@ function createbtns(){
     spetestbtn.className = "menubutton";
     spetestbtn.innerHTML = "Speedsdt"
     btncontainer.appendChild(spetestbtn);
-
-
 }
