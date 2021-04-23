@@ -12,16 +12,12 @@
     <div id="header">
         <h1>Python DNS server</h1>
     </div>
-    <div id="sidebar">
-        <div id="configbutton" class="navbutton">Configurations</div>
-        <div id="statisticsbutton" class="navbutton">Statistics</div>
-    </div>
     <div id="maincontainer">
+        <h2 style="width: 50%;">{{errormessage}}</h2>
         <div id="buttoncontainer"></div>
+            <a class="menubutton" href="{{url_for('home')}}">Go to home page</a>
         <div id="contentcontainer"></div>
-        <div id="testdiv"></div>
     </div>
-    <script src="{{ url_for('static', filename = 'app.js')}}"></script>
 </body>
 
 </html>

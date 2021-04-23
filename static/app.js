@@ -8,39 +8,53 @@ var btncontainer = document.getElementById("buttoncontainer");
 var contentcontainer = document.getElementById("contentcontainer");
 var testdiv = document.getElementById("testdiv")
 
+prettyurl = prettyprinturl(window.location.pathname);
 
-if(window.location.pathname == "/statistics" || window.location.pathname == "/statistics/"){
+//these if statement checks the current url and edits maincontainer depending on the url
+if(prettyurl == ""){
+    contentcontainer.innerHTML = "This is the home page, click on statistics or configurations for more options"
     btncontainer.innerHTML = "";
-    window.history.replaceState({}, null, "/statistics");
+    window.history.replaceState({}, null, "/");
+    }
+
+
+if(prettyurl == "/statistics"){
+    window.history.replaceState({}, null, prettyurl);
     contentcontainer.innerHTML = "stats"
     createstatsbtns();
 }
 
-if(window.location.pathname == "/statistics/speed"){
-    btncontainer.innerHTML = "";
-    window.history.replaceState({}, null, "/statistics");
-    contentcontainer.innerHTML = "stats"
+if(prettyurl == "/statistics/speed"){
+    window.history.replaceState({}, null, prettyurl);
+    contentcontainer.innerHTML = "stats/speed"
     createstatsbtns();
 }
 
+//to delete "/" at the end of url
+function prettyprinturl(url){
+    if (url.charAt(url.length-1) == "/"){
+        url = url.substring(0,(url.length-1));
+        return url;
+    }
+}
 
 //onclick events for navbar and header
 configbtn.onclick = function(){
-    btncontainer.innerHTML = "";
+    btncontainer.innerHTML = ""
     window.history.pushState({}, null, "/configurations");
     contentcontainer.innerHTML = "configs"
+    createconfigbtns();
 }
 statsbtn.onclick = function(){
-    btncontainer.innerHTML = "";
+    btncontainer.innerHTML = ""
     window.history.pushState({}, null, "/statistics");
     contentcontainer.innerHTML = "stats"
     createstatsbtns();
 }
 
 headerbtn.onclick = function(){
-    btncontainer.innerHTML = "";
     window.history.pushState({}, null, "/");
-    testdiv.innerHTML = "This is the home page, click on statistics or configurations for more options"
+    contentcontainer.innerHTML = "This is the home page, click on statistics or configurations for more options"
 }
 
 //creates buttons and listeners for statistics menu
@@ -49,14 +63,12 @@ function createstatsbtns(){
     speedtestbtn.className = "menubutton";
     speedtestbtn.innerHTML = "Speedtest"
     btncontainer.appendChild(speedtestbtn);
+}
 
-    let speetestbtn = document.createElement("div");
-    speetestbtn.className = "menubutton";
-    speetestbtn.innerHTML = "Speedsdt"
-    btncontainer.appendChild(speetestbtn);
-
-    let spetestbtn = document.createElement("div");
-    spetestbtn.className = "menubutton";
-    spetestbtn.innerHTML = "Speedsdt"
-    btncontainer.appendChild(spetestbtn);
+//creates buttons and listeners for configurations menu
+function createconfigbtns(){
+    let speedtestbtn = document.createElement("div");
+    speedtestbtn.className = "menubutton";
+    speedtestbtn.innerHTML = "Blacklist";
+    btncontainer.appendChild(speedtestbtn);
 }

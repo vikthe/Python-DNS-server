@@ -46,7 +46,7 @@ h1 {
 }
 
 .menubutton{
-    width: 100px;
+    width: auto;
     height: 20px;
     border-radius: 15px;
     background-color:rgb(204, 201, 201);
