@@ -128,11 +128,18 @@ def checkdomainname(domainname):
             with open(list, "r") as lf:
                 if listtype == "blacklist":
                     for line in lf:
-                        if domainname == line.split()[1].lower() and not iscomment(line):
-                            return True
+                        line = line.strip()
+                        print("Line", line)
+                        if len(line.split()) >= 2 and not iscomment(line):
+                            if domainname == line.split()[1].lower():
+                                return True
+                        elif len(line.split()) == 1 and not iscomment(line):
+                            if domainname == line:
+                                return True
 
                 elif listtype == "wordlist":
                     for line in lf:
+                        line = line.strip()
                         if not iscomment(line):
                             words = line.split(",")
                             for word in words:
@@ -141,11 +148,13 @@ def checkdomainname(domainname):
 
                 elif listtype == "whitelist":
                     for line in lf:
+                        line = line.strip()
                         if domainname == line.lower() and not iscomment(line):
                             return True
 
                 elif listtype == "locallist":
                     for line in lf:
+                        line = line.strip()
                         if domainname == line.split()[1].lower() and not iscomment(line):
                             return line.split()[0].lower()
 

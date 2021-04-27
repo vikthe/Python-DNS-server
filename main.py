@@ -1,7 +1,7 @@
 from DNS import DNSrequest
 import socket
-import configurations as config
-config.init()
+import configurations as DNSconfig
+DNSconfig.init()
 
 import threading
 from flask import Flask, render_template, request, redirect, url_for
@@ -20,18 +20,21 @@ def rootstats():
 def rootconfig():
     return render_template("index.html")
 
+@app.route("/statistics/speedtest/")
+def stats():
+    return render_template("index.html")
 
-@app.route("/statistics/<key>/")
-def stats(key):
-    if key == "speed":
-        return render_template("index.html")
-    #return redirect(url_for('stats', key="/"))
-
-@app.route("/configurations/<key>/")
-def config(key):
-    if key == "blacklist":
-        return render_template("index.html")
-    #return redirect(url_for('config', key="/"))
+@app.route("/configurations/blacklist/", methods = ["POST", "GET"])
+def config():
+    if request.method == 'POST':
+        #print("Hej")
+        form = request.form
+        print(form)
+        print("Action", form["action"])
+        print(form)
+        if "action" in form:
+            print("Action", form["action"])
+    return render_template("index.html")
 
 @app.errorhandler(Exception)
 def error(e):
@@ -57,7 +60,7 @@ while True:
     req = DNSrequest(data)
     print("Domainname", req.domainname)
 
-    ip, addresstype = config.checkdomainname(req.domainname)
+    ip, addresstype = DNSconfig.checkdomainname(req.domainname)
     print(ip, addresstype)
 
     if addresstype == "local":

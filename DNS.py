@@ -18,7 +18,7 @@ class DNSrequest:
         self.stopbyte = length_byte - 1
         self.domainname = self.domainname[:-2]
 
-    #forwardar DNS-paket från publik DNS
+    #forwardars DNS-request to public DNS
     def getpublicresponse(self):
         port = 53
         size = 512
@@ -39,9 +39,9 @@ class DNSrequest:
             return data
 
 
-    #skapar response från grunden
+    #create response from scratch
     def getlocalresponse(self, ipaddress, TTLinseconds):
-        # Skapa DNS-header
+        # Create DNS-header
         ID = self.requestdata[0:2]
         Flags = b'\x81\x80'
         QDCOUNT = b'\x00\x01'
@@ -50,13 +50,13 @@ class DNSrequest:
         ARCOUNT = b'\x00\x00'
         Header = ID + Flags + QDCOUNT + ANCOUNT + NSCOUNT + ARCOUNT
 
-        # Skapa DNS-question
+        # create DNS-question
         QNAME = self.requestdata[12:self.stopbyte]
         QTYPE = b'\x00\x01'
         QCLASS = b'\x00\x01'
         Question = QNAME + b'\x00' + QTYPE + QCLASS
 
-        # Skapa DNS-answer
+        # create DNS-answer
         NAME = b'\xc0\x0c'
         TYPE = b'\x00\x01'
         CLASS = b'\x00\x01'
@@ -82,6 +82,6 @@ class DNSrequest:
 
         Answer = NAME + TYPE + CLASS + TTL + RDLENGTH + RDATA
 
-        #Lägger ihop alla delar till ett DNS-paket
+        #adds all parts to the packet
         packet = Header + Question + Answer
         return packet
