@@ -21,19 +21,29 @@ def rootconfig():
     return render_template("index.html")
 
 @app.route("/statistics/speedtest/")
-def stats():
+def statsspeedtest():
     return render_template("index.html")
 
 @app.route("/configurations/blacklist/", methods = ["POST", "GET"])
-def config():
+def configblacklist():
     if request.method == 'POST':
-        #print("Hej")
         form = request.form
-        print(form)
-        print("Action", form["action"])
-        print(form)
-        if "action" in form:
-            print("Action", form["action"])
+        if "action" in form and "value" in form:
+            action = form["action"]
+            value = form["value"]
+            blacklistarray = DNSconfig.getfromjson("Blacklists")
+            DNSconfig.setlist(blacklistarray, action, value)
+    return render_template("index.html")
+
+@app.route("/configurations/whitelist/", methods = ["POST", "GET"])
+def configwhitelist():
+    if request.method == 'POST':
+        form = request.form
+        if "action" in form and "value" in form:
+            action = form["action"]
+            value = form["value"]
+            whitelistarray = DNSconfig.getfromjson("Whitelists")
+            DNSconfig.setlist(whitelistarray, action, value)
     return render_template("index.html")
 
 @app.errorhandler(Exception)
@@ -53,6 +63,7 @@ port = 53
 size = 512
 s.bind((host,port))
 
+
 while True:
     data , addr = s.recvfrom(size)
     print("Raw request", data)
@@ -71,6 +82,3 @@ while True:
 
     print("Response", response)
     s.sendto(response, addr)
-
-
-

@@ -92,9 +92,9 @@ def setlist(listarray, action, value):
     #function to change or set value in lists (blacklist, whitelist etc)
     if action == "add":
         firstlist = listarray[0]
-        print(firstlist)
+        print("Configurations: setlist", firstlist)
         with open(firstlist, "a") as lf:
-            lf.write(value + "\n")
+            lf.write( "\n" + value)
         lf.close()
 
     elif action == "remove":
@@ -103,8 +103,6 @@ def setlist(listarray, action, value):
             print(list)
             with open(list, "r") as lf:
                 for line in lf:
-                    #print(line)
-                    #print(value)
                     if line.strip() != value and line != '' and line != '\n':
                             linelist.append(line)
             lf.close()
