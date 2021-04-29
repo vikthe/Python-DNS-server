@@ -2,6 +2,7 @@ from DNS import DNSrequest
 import socket
 import configurations as DNSconfig
 DNSconfig.init()
+import time
 
 import threading
 from flask import Flask, render_template, request, redirect, url_for
@@ -26,25 +27,30 @@ def statsspeedtest():
 
 @app.route("/configurations/blacklist/", methods = ["POST", "GET"])
 def configblacklist():
+    blacklistarray = DNSconfig.getfromjson("Blacklists")
+    alllistentries = DNSconfig.getfromlist(blacklistarray)
+    print(alllistentries)
     if request.method == 'POST':
         form = request.form
         if "action" in form and "value" in form:
             action = form["action"]
             value = form["value"]
-            blacklistarray = DNSconfig.getfromjson("Blacklists")
             DNSconfig.setlist(blacklistarray, action, value)
-    return render_template("index.html")
+    return render_template("index.html", data = alllistentries)
 
 @app.route("/configurations/whitelist/", methods = ["POST", "GET"])
 def configwhitelist():
+    whitelistarray = DNSconfig.getfromjson("Whitelists")
+    alllistentries = DNSconfig.getfromlist(whitelistarray)
+    print(alllistentries)
     if request.method == 'POST':
         form = request.form
         if "action" in form and "value" in form:
             action = form["action"]
             value = form["value"]
-            whitelistarray = DNSconfig.getfromjson("Whitelists")
             DNSconfig.setlist(whitelistarray, action, value)
-    return render_template("index.html")
+            DNSconfig.setlist(whitelistarray, action, value)
+    return render_template("index.html", data = alllistentries)
 
 @app.errorhandler(Exception)
 def error(e):
@@ -52,7 +58,7 @@ def error(e):
 
 
 if __name__ == "__main__":
-    t = threading.Thread(target=app.run)
+    t = threading.Thread(target=app.run(debug=True))
     t.start()
 
 
@@ -63,9 +69,11 @@ port = 53
 size = 512
 s.bind((host,port))
 
-
 while True:
+    #start = time.time() * 1000
     data , addr = s.recvfrom(size)
+    start = time.time()*1000
+
     print("Raw request", data)
 
     req = DNSrequest(data)
@@ -82,3 +90,4 @@ while True:
 
     print("Response", response)
     s.sendto(response, addr)
+    print(time.time()*1000 - start)

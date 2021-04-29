@@ -111,6 +111,16 @@ def setlist(listarray, action, value):
                 lf.writelines(linelist)
             lf.close()
 
+#get all values from a list type. example get all values from all blacklists
+def getfromlist(listarray):
+    completelist = []
+    for list in listarray:
+        print(list)
+        with open(list, "r") as lf:
+            for line in lf:
+                if line != '' and line != '\n':
+                    completelist.append(line)
+    return completelist
 
 def checkdomainname(domainname):
     domainname = domainname.lower()

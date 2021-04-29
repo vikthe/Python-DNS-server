@@ -21,6 +21,9 @@
         <div id="contentcontainer"></div>
         <div id="testdiv"></div>
     </div>
+    <script>
+        {% if data is defined %}var flaskdata = {{data|safe}}{% endif %}
+    </script>
     <script src="{{ url_for('static', filename = 'app.js')}}"></script>
 </body>
 
