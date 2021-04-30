@@ -25,32 +25,37 @@ def rootconfig():
 def statsspeedtest():
     return render_template("index.html")
 
-@app.route("/configurations/blacklist/", methods = ["POST", "GET"])
-def configblacklist():
-    blacklistarray = DNSconfig.getfromjson("Blacklists")
-    alllistentries = DNSconfig.getfromlist(blacklistarray)
+
+def flasklistconfig(listtype):
+    #handles listchanges and return all listentires to display in the browser
+    listarray = DNSconfig.getfromjson(listtype)
+    alllistentries = DNSconfig.getfromlist(listarray)
     print(alllistentries)
     if request.method == 'POST':
         form = request.form
         if "action" in form and "value" in form:
             action = form["action"]
             value = form["value"]
-            DNSconfig.setlist(blacklistarray, action, value)
-    return render_template("index.html", data = alllistentries)
+            DNSconfig.setlist(listarray, action, value)
+            return render_template("index.html")
+    return render_template("index.html", data=alllistentries)
+
+
+@app.route("/configurations/blacklist/", methods = ["POST", "GET"])
+def configblacklist():
+    return flasklistconfig("Blacklists")
 
 @app.route("/configurations/whitelist/", methods = ["POST", "GET"])
 def configwhitelist():
-    whitelistarray = DNSconfig.getfromjson("Whitelists")
-    alllistentries = DNSconfig.getfromlist(whitelistarray)
-    print(alllistentries)
-    if request.method == 'POST':
-        form = request.form
-        if "action" in form and "value" in form:
-            action = form["action"]
-            value = form["value"]
-            DNSconfig.setlist(whitelistarray, action, value)
-            DNSconfig.setlist(whitelistarray, action, value)
-    return render_template("index.html", data = alllistentries)
+   return flasklistconfig("Whitelists")
+
+@app.route("/configurations/localaddresslist/", methods = ["POST", "GET"])
+def configlocaladdresslist():
+    return flasklistconfig("Localaddresslists")
+
+@app.route("/configurations/wordlist/", methods = ["POST", "GET"])
+def configwordlist():
+    return flasklistconfig("Wordlists")
 
 @app.errorhandler(Exception)
 def error(e):

@@ -60,8 +60,6 @@ def getfromjson(list):
     except FileNotFoundError:
         print("FileNotFoundError: config.json doesn't exists")
 
-
-
 def setjson(category, action, value):
     #function to change json file (used by flask app)
     try:
@@ -109,6 +107,13 @@ def setlist(listarray, action, value):
             with open(list, "w") as lf:
                 print("linelist", linelist)
                 lf.writelines(linelist)
+            lf.close()
+
+    elif action == "clear":
+        for list in listarray:
+            print(list)
+            with open(list, "w") as lf:
+                lf.write("")
             lf.close()
 
 #get all values from a list type. example get all values from all blacklists
