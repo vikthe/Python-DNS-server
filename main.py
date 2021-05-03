@@ -3,6 +3,7 @@ import socket
 import configurations as DNSconfig
 DNSconfig.init()
 import time
+import json
 
 import threading
 from flask import Flask, render_template, request, redirect, url_for
@@ -17,45 +18,52 @@ def home():
 def rootstats():
     return render_template("index.html")
 
-@app.route("/configurations/")
-def rootconfig():
-    return render_template("index.html")
-
 @app.route("/statistics/speedtest/")
 def statsspeedtest():
     return render_template("index.html")
 
+@app.route("/configurations/")
+def rootconfig():
+    return render_template("index.html")
+
 
 def flasklistconfig(listtype):
-    #handles listchanges and return all listentires to display in the browser
+    #handles listchanges
     listarray = DNSconfig.getfromjson(listtype)
-    alllistentries = DNSconfig.getfromlist(listarray)
-    print(alllistentries)
     if request.method == 'POST':
         form = request.form
         if "action" in form and "value" in form:
             action = form["action"]
             value = form["value"]
             DNSconfig.setlist(listarray, action, value)
-            return render_template("index.html")
-    return render_template("index.html", data=alllistentries)
+    return render_template("index.html")
 
 
 @app.route("/configurations/blacklist/", methods = ["POST", "GET"])
 def configblacklist():
-    return flasklistconfig("Blacklists")
+    return flasklistconfig("blacklists")
 
 @app.route("/configurations/whitelist/", methods = ["POST", "GET"])
 def configwhitelist():
-   return flasklistconfig("Whitelists")
+   return flasklistconfig("whitelists")
 
 @app.route("/configurations/localaddresslist/", methods = ["POST", "GET"])
 def configlocaladdresslist():
-    return flasklistconfig("Localaddresslists")
+    return flasklistconfig("localaddresslists")
 
 @app.route("/configurations/wordlist/", methods = ["POST", "GET"])
 def configwordlist():
-    return flasklistconfig("Wordlists")
+    return flasklistconfig("wordlists")
+
+@app.route("/configurations/data", methods = ["POST", "GET"])
+def getdata():
+    args = request.args
+    if "getlist" in args:
+        listarray = DNSconfig.getfromjson(args["getlist"])
+        alllistentries = DNSconfig.getfromlist(listarray)
+        print("allist", alllistentries)
+        dict = {0:alllistentries}
+        return dict
 
 @app.errorhandler(Exception)
 def error(e):

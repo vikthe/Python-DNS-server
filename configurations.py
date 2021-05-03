@@ -15,8 +15,8 @@ def init():
         wordlists = ["config_files" + os.sep + "wordlist.txt"]
         localaddresslists = ["config_files" + os.sep + "localaddresslist.txt"]
         publicdnsservers= ["8.8.8.8", "8.8.4.4"]
-        dict.append({'Blacklists': blacklists, 'Whitelists': whitelists,'Wordlists': wordlists,
-                     'Localaddresslists': localaddresslists, 'Public_DNS_servers': publicdnsservers})
+        dict.append({'blacklists': blacklists, 'whitelists': whitelists,'wordlists': wordlists,
+                     'localaddresslists': localaddresslists, 'public_DNS_servers': publicdnsservers})
 
         with open("config.json", "w+", encoding="utf-8") as configfile:
             json.dump(dict, configfile, indent=2)
@@ -40,7 +40,7 @@ def init():
                 f.write(message)
             f.close()
 
-    checkandcreatefiles("blacklist.txt", "#Blocks specified domain, example: \n#0.0.0.0 youtube.com")
+    checkandcreatefiles("blacklist.txt", "#Blocks specified domain, example: \n#youtube.com")
     checkandcreatefiles("localaddresslist.txt", "#Add addresses in a local network, example: \n#192.168.1.10 my.website.com")
     checkandcreatefiles("whitelist.txt", "Add domains you want to whitelist from wordlist or/and blacklist, example:\n#youtube.com")
     checkandcreatefiles("wordlist.txt", "#Domainnames with these words included in are blocked, example: \n#ad, ads, word, hello")
@@ -127,6 +127,7 @@ def getfromlist(listarray):
                     completelist.append(line)
     return completelist
 
+#a function to check if the domainname should be blocked or not
 def checkdomainname(domainname):
     domainname = domainname.lower()
     def iscomment(line):
@@ -136,6 +137,7 @@ def checkdomainname(domainname):
         else:
             return False
 
+    #goes through all lists
     def checklists(listarray, listtype):
         for list in listarray:
             with open(list, "r") as lf:
@@ -174,21 +176,21 @@ def checkdomainname(domainname):
         return False
 
 
-    blacklistcheck = checklists(getfromjson('Blacklists'), "blacklist")
-    whitelistcheck = checklists(getfromjson('Whitelists'), "whitelist")
+    blacklistcheck = checklists(getfromjson('blacklists'), "blacklist")
+    whitelistcheck = checklists(getfromjson('whitelists'), "whitelist")
     if blacklistcheck and not whitelistcheck:
         #returns 0.0.0.0 if blacklisted while not whitelisted, if not it checks if domainname is in wordlist or locallist
         return "0.0.0.0", "local"
 
     else:
-        wordlistcheck = checklists(getfromjson('Wordlists'), "wordlist")
+        wordlistcheck = checklists(getfromjson('wordlists'), "wordlist")
         if wordlistcheck and not whitelistcheck:
             #if domainname is blocked by wordlist and not in whitelist function returns 0.0.0.0
             return "0.0.0.0", "local"
 
         else:
             #if domainame not blocked yet it checks localaddresslist
-            locallistcheck = checklists(getfromjson('Localaddresslists'), "locallist")
+            locallistcheck = checklists(getfromjson('localaddresslists'), "locallist")
             if locallistcheck:
                 return locallistcheck, "local"
 

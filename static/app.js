@@ -4,7 +4,6 @@ var headerbtn = document.getElementById("header");
 var maincontainer = document.getElementById("maincontainer");
 var btncontainer = document.getElementById("buttoncontainer");
 var contentcontainer = document.getElementById("contentcontainer");
-var request = new XMLHttpRequest(); //object for posting data to flask server
 var testdiv = document.getElementById("testdiv");
 
 //to show the right content when url is written in the url bar
@@ -60,37 +59,37 @@ function createmenubutton(text, newonclickstate, ishref) {
 //this function handles what to display in maincontiner
 function displaycontent(state) {
     if (state.startsWith("/configurations")) {
-        btncontainer.innerHTML = ""
-        contentcontainer.innerHTML = "configs"
-        btncontainer.appendChild(createmenubutton("Blacklist", "/configurations/blacklist", true));
-        btncontainer.appendChild(createmenubutton("Whitelist", "/configurations/whitelist", true));
-        btncontainer.appendChild(createmenubutton("Localaddresses", "/configurations/localaddresslist", true));
-        btncontainer.appendChild(createmenubutton("Wordlists", "/configurations/wordlist", true));
+        btncontainer.innerHTML = "";
+        contentcontainer.innerHTML = "";
+        btncontainer.appendChild(createmenubutton("Blacklist", "/configurations/blacklist", false));
+        btncontainer.appendChild(createmenubutton("Whitelist", "/configurations/whitelist", false));
+        btncontainer.appendChild(createmenubutton("Localaddresses", "/configurations/localaddresslist", false));
+        btncontainer.appendChild(createmenubutton("Wordlists", "/configurations/wordlist", false));
 
         if (state.startsWith("/configurations/blacklist")) {
             inputchangelist(["add", "remove", "clear"], "ex. www.google.com");
-            contentcontainer.appendChild(makeulfromarray(flaskdata));
+            getandsetresponse("/configurations/data?getlist=blacklists", contentcontainer)
         }
 
         if (state.startsWith("/configurations/whitelist")) {
             inputchangelist(["add", "remove", "clear"], "ex. www.google.com");
-            contentcontainer.appendChild(makeulfromarray(flaskdata));
+            getandsetresponse("/configurations/data?getlist=whitelists", contentcontainer)
         }
 
         if (state.startsWith("/configurations/localaddresslist")) {
             inputchangelist(["add", "remove", "clear"], "ex. 192.168.1.10 my.website.com");
-            contentcontainer.appendChild(makeulfromarray(flaskdata));
+            getandsetresponse("/configurations/data?getlist=localaddresslists", contentcontainer)
         }
 
         if (state.startsWith("/configurations/wordlist")) {
             inputchangelist(["add", "remove", "clear"], "ex. ad, ads, some word");
-            contentcontainer.appendChild(makeulfromarray(flaskdata));
+            getandsetresponse("/configurations/data?getlist=wordlists", contentcontainer)
         }
     }
     else if (state.startsWith("/statistics")) {
-        btncontainer.innerHTML = ""
-        contentcontainer.innerHTML = "stats"
-        btncontainer.appendChild(createmenubutton("Speedtest", "statistics/speedtest", false))
+        btncontainer.innerHTML = "";
+        contentcontainer.innerHTML = "";
+        btncontainer.appendChild(createmenubutton("Speedtest", "/statistics/speedtest", false))
     }
     else if (state.startsWith("/")) {
         btncontainer.innerHTML = "";
@@ -121,7 +120,7 @@ function makeulfromarray(array) {
     return ul;
 }
 
-//input and button for changing values of lists the dns server has
+//input and buttons for changing values of lists the dns server has
 function inputchangelist(actions, placeholder) {
     contentcontainer.innerHTML = "";
     let dropdown = createdropdown(actions);
@@ -143,20 +142,22 @@ function inputchangelist(actions, placeholder) {
     button.onclick = function () {
         data = [["action", dropdown.value], ["value", input.value]];
         postdata(data, window.location.href);
-        window.location.href = window.location.href; //to refresh
+        displaycontent(window.location.pathname);
+        input.value = "";
     }
     contentcontainer.appendChild(button);
 
     let refreshbtn = document.createElement("button");
     refreshbtn.innerHTML = "Refresh";
     refreshbtn.onclick = function () {
-        window.location.href = window.location.href; //to refresh
+        window.location.href = window.location.href;
     }
     contentcontainer.appendChild(refreshbtn);
 }
 
 //function to post data to flask
 function postdata(data, destination) {
+    const request = new XMLHttpRequest()
     request.open('POST', destination)
     let form = new FormData();
     for (i = 0; i < data.length; i++) {
@@ -164,4 +165,19 @@ function postdata(data, destination) {
     }
     request.send(form);
     return false;
+}
+
+//function that sends a get request and appends the response as list to appendto variable
+function getandsetresponse(requesturl, appendto) {
+    const request = new XMLHttpRequest();
+    request.open("GET", requesturl);
+    request.send();
+    request.onload = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            let data = request.responseText;
+            let tojson = JSON.parse(data);
+            console.log(data);
+            appendto.appendChild(makeulfromarray(tojson[0]));
+        }
+    }
 }
