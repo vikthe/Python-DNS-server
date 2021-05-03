@@ -3,10 +3,9 @@ import socket
 import configurations as DNSconfig
 DNSconfig.init()
 import time
-import json
 
 import threading
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 app = Flask(__name__)
 
 #this is the flask website server
@@ -18,45 +17,35 @@ def home():
 def rootstats():
     return render_template("index.html")
 
-@app.route("/statistics/speedtest/")
-def statsspeedtest():
+@app.route("/statistics/<statstype>/", methods = ["POST", "GET"])
+@app.route("/statistics/<statstype>", methods = ["POST", "GET"])
+def stats(statstype):
+    #handles listchanges
+    if statstype == "speedtest":
+        pass
     return render_template("index.html")
 
 @app.route("/configurations/")
 def rootconfig():
     return render_template("index.html")
 
-
-def flasklistconfig(listtype):
+@app.route("/configurations/<configtype>/", methods = ["POST", "GET"])
+@app.route("/configurations/<configtype>", methods = ["POST", "GET"])
+def config(configtype):
     #handles listchanges
-    listarray = DNSconfig.getfromjson(listtype)
-    if request.method == 'POST':
-        form = request.form
-        if "action" in form and "value" in form:
-            action = form["action"]
-            value = form["value"]
-            DNSconfig.setlist(listarray, action, value)
+    if configtype in ["blacklist", "whitelist", "localaddresslist", "wordlist"]:
+        listarray = DNSconfig.getfromjson(configtype + "s")
+        if request.method == 'POST':
+            form = request.form
+            if "action" in form and "value" in form:
+                action = form["action"]
+                value = form["value"]
+                DNSconfig.setlist(listarray, action, value)
     return render_template("index.html")
 
-
-@app.route("/configurations/blacklist/", methods = ["POST", "GET"])
-def configblacklist():
-    return flasklistconfig("blacklists")
-
-@app.route("/configurations/whitelist/", methods = ["POST", "GET"])
-def configwhitelist():
-   return flasklistconfig("whitelists")
-
-@app.route("/configurations/localaddresslist/", methods = ["POST", "GET"])
-def configlocaladdresslist():
-    return flasklistconfig("localaddresslists")
-
-@app.route("/configurations/wordlist/", methods = ["POST", "GET"])
-def configwordlist():
-    return flasklistconfig("wordlists")
-
 @app.route("/configurations/data", methods = ["POST", "GET"])
-def getdata():
+#to send get responses with data to client
+def getconfigdata():
     args = request.args
     if "getlist" in args:
         listarray = DNSconfig.getfromjson(args["getlist"])
@@ -65,15 +54,16 @@ def getdata():
         dict = {0:alllistentries}
         return dict
 
+#to handle errors such as wrong url
 @app.errorhandler(Exception)
 def error(e):
     return render_template("error.html", errormessage = e)
 
 
 if __name__ == "__main__":
-    t = threading.Thread(target=app.run(debug=True))
+    #debug = True does not work
+    t = threading.Thread(target=app.run)
     t.start()
-
 
 #this is the DNS server
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

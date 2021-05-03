@@ -132,10 +132,11 @@ def checkdomainname(domainname):
     domainname = domainname.lower()
     def iscomment(line):
         #checks if line is a comment
-        if line[0] == "#":
-            return True
-        else:
-            return False
+        if line != "":
+            if line[0] == "#":
+                return True
+            else:
+                return False
 
     #goes through all lists
     def checklists(listarray, listtype):

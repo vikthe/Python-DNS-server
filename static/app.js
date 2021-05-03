@@ -90,6 +90,10 @@ function displaycontent(state) {
         btncontainer.innerHTML = "";
         contentcontainer.innerHTML = "";
         btncontainer.appendChild(createmenubutton("Speedtest", "/statistics/speedtest", false))
+
+        if (state.startsWith("/statistics/speedtest")) {
+            inputchangelist(["add", "remove", "clear"], "ex. ad, ads, some word");
+        }
     }
     else if (state.startsWith("/")) {
         btncontainer.innerHTML = "";

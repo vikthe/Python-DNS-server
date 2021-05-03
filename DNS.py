@@ -22,7 +22,7 @@ class DNSrequest:
     def getpublicresponse(self):
         port = 53
         size = 512
-        dnsarray = config.getfromjson("Public_DNS_servers")
+        dnsarray = config.getfromjson("public_DNS_servers")
         print(dnsarray)
 
         for address in dnsarray:
