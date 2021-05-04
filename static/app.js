@@ -233,6 +233,7 @@ function dnslatencytest(requesturl, appendto) {
     request.onload = function () {
         if (this.readyState == 4 && this.status == 200) {
             const jsondata = JSON.parse(request.responseText);
+            console.log(jsondata)
             const ip = jsondata["Answer"][0]["data"];
             console.log(ip);
             const newtime = new Date().getTime();

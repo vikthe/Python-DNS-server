@@ -1,4 +1,5 @@
-from DNS import DNSrequest
+from DNS import DNSresponse, DNSrequest
+
 import socket
 import configurations as DNSconfig
 DNSconfig.init()
@@ -37,7 +38,13 @@ def getstatsdata():
             dict = {"Answer":[{"data":ip}]}
             return dict
         elif addresstype == "public":
-            dict = {"Answer": [{"data": ""}]}
+            req = DNSrequest(args["resolvename"])
+            dnsrequest = req.createrequest()
+            res = DNSresponse(dnsrequest)
+            publicresponse = res.getpublicresponse()
+            print("Publicrespons", publicresponse)
+            ipaddress = res.getipaddress(publicresponse)
+            dict = {"Answer": [{"data": ipaddress}]}
             return dict
 
 
@@ -95,17 +102,17 @@ while True:
 
     print("Raw request", data)
 
-    req = DNSrequest(data)
-    print("Domainname", req.domainname)
+    res = DNSresponse(data)
+    print("Domainname", res.domainname)
 
-    ip, addresstype = DNSconfig.checkdomainname(req.domainname)
+    ip, addresstype = DNSconfig.checkdomainname(res.domainname)
     print(ip, addresstype)
 
     if addresstype == "local":
-        response = req.getlocalresponse(ip, 3600)
+        response = res.getlocalresponse(ip, 3600)
 
     elif addresstype == "public":
-        response = req.getpublicresponse()
+        response = res.getpublicresponse()
 
     print("Response", response)
     s.sendto(response, addr)

@@ -1,7 +1,5 @@
 import os
 import json
-import time
-
 
 def init():
     #checks if konfiguretionfile config.json exist and creates new if it doesnt
