@@ -68,32 +68,68 @@ function displaycontent(state) {
 
         if (state.startsWith("/configurations/blacklist")) {
             inputchangelist(["add", "remove", "clear"], "ex. www.google.com");
-            getandsetresponse("/configurations/data?getlist=blacklists", contentcontainer)
+            getandsetresponse("/configurations/data?getlist=blacklists", contentcontainer);
+
         }
 
         if (state.startsWith("/configurations/whitelist")) {
             inputchangelist(["add", "remove", "clear"], "ex. www.google.com");
-            getandsetresponse("/configurations/data?getlist=whitelists", contentcontainer)
+            getandsetresponse("/configurations/data?getlist=whitelists", contentcontainer);
         }
 
         if (state.startsWith("/configurations/localaddresslist")) {
             inputchangelist(["add", "remove", "clear"], "ex. 192.168.1.10 my.website.com");
-            getandsetresponse("/configurations/data?getlist=localaddresslists", contentcontainer)
+            getandsetresponse("/configurations/data?getlist=localaddresslists", contentcontainer);
         }
 
         if (state.startsWith("/configurations/wordlist")) {
             inputchangelist(["add", "remove", "clear"], "ex. ad, ads, some word");
-            getandsetresponse("/configurations/data?getlist=wordlists", contentcontainer)
+            getandsetresponse("/configurations/data?getlist=wordlists", contentcontainer);
         }
     }
     else if (state.startsWith("/statistics")) {
         btncontainer.innerHTML = "";
         contentcontainer.innerHTML = "";
-        btncontainer.appendChild(createmenubutton("Speedtest", "/statistics/speedtest", false))
+        btncontainer.appendChild(createmenubutton("Speedtest", "/statistics/speedtest", false));
 
         if (state.startsWith("/statistics/speedtest")) {
-            inputchangelist(["add", "remove", "clear"], "ex. ad, ads, some word");
+            let input = document.createElement("input");
+            input.type = "text";
+            input.placeholder = "which domain to ping ex. youtube.com";
+            contentcontainer.appendChild(input);
+
+            let button = document.createElement("button");
+            button.innerHTML = "Startspeedtest";
+            button.onclick = function () {
+                if (input.value != undefined && input.value != "") {
+                    let domainname = input.value;
+                    let dnsul = document.createElement("ul");
+                    dnsul.className = "speedtestul";
+                    let dnstitleli = document.createElement("li");
+                    dnstitleli.innerHTML = "Replies from Google DNS";
+                    dnsul.appendChild(dnstitleli);
+                    for (i = 0; i < 10; i++) {
+                        setTimeout(function () {
+                            dnslatencytest("https://dns.google/resolve?name=" + domainname + "&type=A", dnsul);
+                        }, 500 * i)
+                    }
+
+                    let pyul = document.createElement("ul");
+                    let pytitleli = document.createElement("li");
+                    pytitleli.innerHTML = "Replies from Python DNS";
+                    pyul.appendChild(pytitleli);
+                    for (i = 0; i < 10; i++) {
+                        setTimeout(function () {
+                            dnslatencytest("/statistics/data?resolvename=" + domainname, pyul);
+                        }, 500 * i)
+                    }
+                }
+
+            }
+            contentcontainer.appendChild(button);
         }
+
+
     }
     else if (state.startsWith("/")) {
         btncontainer.innerHTML = "";
@@ -178,10 +214,33 @@ function getandsetresponse(requesturl, appendto) {
     request.send();
     request.onload = function () {
         if (this.readyState == 4 && this.status == 200) {
-            let data = request.responseText;
-            let tojson = JSON.parse(data);
-            console.log(data);
-            appendto.appendChild(makeulfromarray(tojson[0]));
+            const jsondata = JSON.parse(request.responseText);
+            console.log(jsondata);
+            appendto.appendChild(makeulfromarray(jsondata[0]));
+        }
+    }
+}
+
+//function that tests latency to a dns server
+//add result as a list to contentcontainer
+function dnslatencytest(requesturl, appendto) {
+    const request = new XMLHttpRequest();
+    contentcontainer.appendChild(appendto);
+    request.open("GET", requesturl);
+    const oldtime = new Date().getTime();
+    console.log(oldtime)
+    request.send();
+    request.onload = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            const jsondata = JSON.parse(request.responseText);
+            const ip = jsondata["Answer"][0]["data"];
+            console.log(ip);
+            const newtime = new Date().getTime();
+            const pingtime = newtime - oldtime;
+            console.log(newtime - oldtime);
+            let li = document.createElement("li");
+            li.innerHTML = String(ip) + " ---- " + String(pingtime) + "  ms";
+            appendto.appendChild(li);
         }
     }
 }

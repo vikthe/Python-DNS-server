@@ -25,6 +25,22 @@ def stats(statstype):
         pass
     return render_template("index.html")
 
+@app.route("/statistics/data", methods = ["POST", "GET"])
+#dns api thing should be here
+def getstatsdata():
+    args = request.args
+    print(args)
+    if "resolvename" in args:
+        ip, addresstype = DNSconfig.checkdomainname(args["resolvename"])
+        print(ip, addresstype)
+        if addresstype == "local":
+            dict = {"Answer":[{"data":ip}]}
+            return dict
+        elif addresstype == "public":
+            dict = {"Answer": [{"data": ""}]}
+            return dict
+
+
 @app.route("/configurations/")
 def rootconfig():
     return render_template("index.html")
