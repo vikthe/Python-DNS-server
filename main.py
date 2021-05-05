@@ -3,7 +3,6 @@ from DNS import DNSresponse, DNSrequest
 import socket
 import configurations as DNSconfig
 DNSconfig.init()
-import time
 
 import threading
 from flask import Flask, render_template, request
@@ -88,18 +87,16 @@ if __name__ == "__main__":
     t = threading.Thread(target=app.run)
     t.start()
 
+
 #this is the DNS server
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-host = ''
-port = 53
-size = 512
-s.bind((host,port))
-
 while True:
-    #start = time.time() * 1000
-    data , addr = s.recvfrom(size)
-    start = time.time()*1000
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #new socket has to be made every time, otherwise WINERROR:15004
+    host = ''
+    port = 53
+    size = 512
+    s.bind((host, port))
 
+    data , addr = s.recvfrom(size)
     print("Raw request", data)
 
     res = DNSresponse(data)
@@ -116,4 +113,4 @@ while True:
 
     print("Response", response)
     s.sendto(response, addr)
-    print(time.time()*1000 - start)
+    s.close()

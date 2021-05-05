@@ -96,8 +96,22 @@ h1 {
     margin-right: 20%;
 }
 
-.speedtestlist{
+.speedtestul{
+    text-align: center;
+    display: inline-table;
+    border: black;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.speedtestli{
     width: auto;
-    height: 100%;
-    padding: auto;
+    border: black;
+    font-size: 17px;
+}
+
+.speedtestlititle{
+    width: auto;
+    border: black;
+    font-size: 22px;
 }

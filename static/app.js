@@ -100,28 +100,34 @@ function displaycontent(state) {
 
             let button = document.createElement("button");
             button.innerHTML = "Startspeedtest";
+            let dnsul = document.createElement("ul");
+            dnsul.className = "speedtestul";
+            let pyul = document.createElement("ul");
+            pyul.className = "speedtestul";
             button.onclick = function () {
                 if (input.value != undefined && input.value != "") {
                     let domainname = input.value;
-                    let dnsul = document.createElement("ul");
-                    dnsul.className = "speedtestul";
+                    dnsul.innerHTML = "";
+                    pyul.innerHTML = "";
                     let dnstitleli = document.createElement("li");
-                    dnstitleli.innerHTML = "Replies from Google DNS";
+                    dnstitleli.className = "speedtestlititle";
+                    dnstitleli.innerHTML = "Replies from Google Public DNS";
                     dnsul.appendChild(dnstitleli);
                     for (i = 0; i < 10; i++) {
                         setTimeout(function () {
                             dnslatencytest("https://dns.google/resolve?name=" + domainname + "&type=A", dnsul);
-                        }, 500 * i)
+                        }, 300 * i)
                     }
 
-                    let pyul = document.createElement("ul");
+                    
                     let pytitleli = document.createElement("li");
                     pytitleli.innerHTML = "Replies from Python DNS";
+                    pytitleli.className = "speedtestlititle";
                     pyul.appendChild(pytitleli);
                     for (i = 0; i < 10; i++) {
                         setTimeout(function () {
                             dnslatencytest("/statistics/data?resolvename=" + domainname, pyul);
-                        }, 500 * i)
+                        }, 300 * i)
                     }
                 }
 
@@ -240,6 +246,7 @@ function dnslatencytest(requesturl, appendto) {
             const pingtime = newtime - oldtime;
             console.log(newtime - oldtime);
             let li = document.createElement("li");
+            li.className = "speedtestli"
             li.innerHTML = String(ip) + " ---- " + String(pingtime) + "  ms";
             appendto.appendChild(li);
         }

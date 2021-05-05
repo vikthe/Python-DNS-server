@@ -143,7 +143,6 @@ def checkdomainname(domainname):
                 if listtype == "blacklist":
                     for line in lf:
                         line = line.strip()
-                        print("Line", line)
                         if len(line.split()) >= 2 and not iscomment(line):
                             if domainname == line.split()[1].lower():
                                 return True
