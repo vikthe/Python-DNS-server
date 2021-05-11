@@ -106,6 +106,7 @@ function displaycontent(state) {
             pyul.className = "speedtestul";
             button.onclick = function () {
                 if (input.value != undefined && input.value != "") {
+                    //this runs speedtest and displays output
                     let domainname = input.value;
                     dnsul.innerHTML = "";
                     pyul.innerHTML = "";
@@ -214,9 +215,10 @@ function postdata(data, destination) {
 }
 
 //function that sends a get request and appends the response as list to appendto variable
+//is used to show all lists
 function getandsetresponse(requesturl, appendto) {
     const request = new XMLHttpRequest();
-    request.open("GET", requesturl);
+    request.open("POST", requesturl);
     request.send();
     request.onload = function () {
         if (this.readyState == 4 && this.status == 200) {
