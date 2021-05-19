@@ -96,6 +96,11 @@ h1 {
     margin-right: 20%;
 }
 
+.showalllistitems{
+    overflow:auto;
+    height:70%
+}
+
 .speedtestul{
     text-align: center;
     display: inline-table;
@@ -115,3 +120,4 @@ h1 {
     border: black;
     font-size: 22px;
 }
+

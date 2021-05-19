@@ -3,7 +3,6 @@ import json
 
 def init():
     #checks if konfiguretionfile config.json exist and creates new if it doesnt
-    print(os.getcwd() + os.sep + "config.json")
     if os.path.exists(os.getcwd() + os.sep + "config.json"):
         print(os.getcwd() + os.sep + "config.json", "exists move on")
     else:
@@ -50,15 +49,19 @@ def getfromjson(list):
         with open("config.json", "r") as cf:
             configdata = json.load(cf)
         cf.close()
-
-        data = configdata[0][list]
-        print(list, data)
-        return data
+        if list == "all":
+            data = configdata[0]
+            return data
+        else:
+            data = configdata[0][list]
+            print(list, data)
+            return data
 
     except FileNotFoundError:
         print("FileNotFoundError: config.json doesn't exists")
 
 def setjson(category, action, value):
+    #value is a path example config_files\blacklist.txt
     #function to change json file (used by flask app)
     try:
         with open("config.json", "r") as cf:
@@ -67,11 +70,11 @@ def setjson(category, action, value):
         cf.close()
 
         if action == "add":
-            categorydata.append("config_files" + os.sep + value)
+            categorydata.append(value)
 
         elif action == "remove":
             for item in categorydata:
-                if item.split(os.sep)[-1] == value:
+                if item == value:
                     categorydata.remove(item)
 
         with open("config.json", "w") as cf:

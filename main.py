@@ -1,5 +1,7 @@
 from DNS import DNSresponse, DNSrequest
 
+import json
+import os
 import socket
 import configurations as DNSconfig
 DNSconfig.init()
@@ -7,6 +9,10 @@ DNSconfig.init()
 import threading
 from flask import Flask, render_template, request
 app = Flask(__name__)
+
+from werkzeug.utils import secure_filename
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['UPLOAD_FOLDER'] = "config_files"
 
 #this is the flask website server
 @app.route("/")
@@ -20,13 +26,12 @@ def rootstats():
 @app.route("/statistics/<statstype>/", methods = ["POST", "GET"])
 @app.route("/statistics/<statstype>", methods = ["POST", "GET"])
 def stats(statstype):
-    #handles listchanges
     if statstype == "speedtest":
         pass
     return render_template("index.html")
 
 @app.route("/statistics/data", methods = ["POST", "GET"])
-#dns api thing should be here
+#dns "api"
 def getstatsdata():
     args = request.args
     print(args)
@@ -63,6 +68,30 @@ def config(configtype):
                 action = form["action"]
                 value = form["value"]
                 DNSconfig.setlist(listarray, action, value)
+
+    elif configtype == "upload":
+        if request.method == 'POST':
+            if "file" in request.files and "listtype" in request.form:
+                file = request.files["file"]
+                form = request.form
+                print("form", form)
+                if file.filename == "":
+                    return render_template("index.html")
+                else:
+                    filename = secure_filename(file.filename)
+                    savepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    file.save(savepath)
+                    DNSconfig.setjson(form["listtype"] + "s", "add", savepath)
+
+            if "delete" in request.form:
+                form = request.form
+                deletepath = form["delete"].split(":")[1]
+                DNSconfig.setjson(form["delete"].split(":")[0] + "s", "remove", deletepath)
+                print(form["delete"].split(":")[0] + "s", "remove", deletepath)
+                os.remove(deletepath)
+
+
+
     return render_template("index.html")
 
 @app.route("/configurations/data", methods = ["POST", "GET"])
@@ -75,6 +104,13 @@ def getconfigdata():
         print("allist", alllistentries)
         dict = {0:alllistentries}
         return dict
+
+    elif "getjson" in args:
+        if request.method == 'POST':
+            if "getjson" in args:
+                dict = DNSconfig.getfromjson("all")
+                return dict
+
 
 #to handle errors such as wrong url
 @app.errorhandler(Exception)

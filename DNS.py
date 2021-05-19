@@ -38,7 +38,6 @@ class DNSresponse:
         port = 53
         size = 512
         dnsarray = config.getfromjson("public_DNS_servers")
-        print(dnsarray)
 
         for address in dnsarray:
             try:
@@ -48,7 +47,7 @@ class DNSresponse:
                 sock.sendto(self.requestdata, server_address)
                 data, _ = sock.recvfrom(size)
             except:
-                print(address + " fungerar ej, testar nästa publika DNS")
+                print(address + " doesn't work, tries text public DNS")
 
             sock.close()
             return data
