@@ -49,6 +49,7 @@ def getfromjson(list):
         with open("config.json", "r") as cf:
             configdata = json.load(cf)
         cf.close()
+
         if list == "all":
             data = configdata[0]
             return data

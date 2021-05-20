@@ -1,6 +1,5 @@
 from DNS import DNSresponse, DNSrequest
 
-import json
 import os
 import socket
 import configurations as DNSconfig
@@ -13,6 +12,7 @@ app = Flask(__name__)
 from werkzeug.utils import secure_filename
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = "config_files"
+allowed_filetypes = ['txt']
 
 #this is the flask website server
 @app.route("/")
@@ -75,22 +75,18 @@ def config(configtype):
                 file = request.files["file"]
                 form = request.form
                 print("form", form)
-                if file.filename == "":
-                    return render_template("index.html")
-                else:
+                if file.filename != "" and file.filename.split(".")[-1] in allowed_filetypes:
                     filename = secure_filename(file.filename)
                     savepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                     file.save(savepath)
                     DNSconfig.setjson(form["listtype"] + "s", "add", savepath)
 
-            if "delete" in request.form:
+            elif "delete" in request.form:
                 form = request.form
                 deletepath = form["delete"].split(":")[1]
                 DNSconfig.setjson(form["delete"].split(":")[0] + "s", "remove", deletepath)
                 print(form["delete"].split(":")[0] + "s", "remove", deletepath)
                 os.remove(deletepath)
-
-
 
     return render_template("index.html")
 
