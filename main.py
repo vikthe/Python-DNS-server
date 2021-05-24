@@ -115,8 +115,12 @@ def error(e):
 
 
 if __name__ == "__main__":
-    #debug = True does not work
-    t = threading.Thread(target=app.run)
+    # doesnt work with function arguments in thread target here
+    # therefore apprun function runs the app
+    def apprun():
+        app.run(host="0.0.0.0")
+
+    t = threading.Thread(target=apprun)
     t.start()
 
 
