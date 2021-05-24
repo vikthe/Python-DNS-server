@@ -38,7 +38,7 @@ def init():
             f.close()
 
     checkandcreatefiles("blacklist.txt", "#Blocks specified domain, example: \n#youtube.com")
-    checkandcreatefiles("localaddresslist.txt", "#Add addresses in a local network, example: \n#192.168.1.10 my.website.com")
+    checkandcreatefiles("localaddresslist.txt", "#Add addresses in a local network, example: \n#192.168.1.10 my.website")
     checkandcreatefiles("whitelist.txt", "Add domains you want to whitelist from wordlist or/and blacklist, example:\n#youtube.com")
     checkandcreatefiles("wordlist.txt", "#Domainnames with these words included in are blocked, example: \n#ad, ads, word, hello")
 
@@ -147,33 +147,37 @@ def checkdomainname(domainname):
                 if listtype == "blacklist":
                     for line in lf:
                         line = line.strip()
-                        if len(line.split()) >= 2 and not iscomment(line):
-                            if domainname == line.split()[1].lower():
-                                return True
-                        elif len(line.split()) == 1 and not iscomment(line):
-                            if domainname == line:
-                                return True
+                        if line != None and line != "":
+                            if len(line.split()) >= 2 and not iscomment(line):
+                                if domainname == line.split()[1].lower():
+                                    return True
+                            elif len(line.split()) == 1 and not iscomment(line):
+                                if domainname == line:
+                                    return True
 
                 elif listtype == "wordlist":
                     for line in lf:
                         line = line.strip()
-                        if not iscomment(line):
-                            words = line.split(",")
-                            for word in words:
-                                if domainname ==  word.lower():
-                                    return True
+                        if line != None and line != "":
+                            if not iscomment(line):
+                                words = line.split(",")
+                                for word in words:
+                                    if domainname ==  word.lower():
+                                        return True
 
                 elif listtype == "whitelist":
                     for line in lf:
                         line = line.strip()
-                        if domainname == line.lower() and not iscomment(line):
-                            return True
+                        if line != None and line != "":
+                            if domainname == line.lower() and not iscomment(line):
+                                return True
 
                 elif listtype == "locallist":
                     for line in lf:
                         line = line.strip()
-                        if domainname == line.split()[1].lower() and not iscomment(line):
-                            return line.split()[0].lower()
+                        if line != None and line != "":
+                            if domainname == line.split()[1].lower() and not iscomment(line):
+                                return line.split()[0].lower()
 
         return False
 

@@ -120,6 +120,7 @@ if __name__ == "__main__":
     def apprun():
         app.run(host="0.0.0.0")
 
+
     t = threading.Thread(target=apprun)
     t.start()
 
